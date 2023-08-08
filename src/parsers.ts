@@ -598,6 +598,7 @@ export class SolanaParser {
 	 */
 	constructor(programInfos: ProgramInfoType[], parsers?: InstructionParserInfo[]) {
 		this.instructionDecoders = new Map();
+		this.instructionParsers = new Map();
 		const standardParsers: InstructionParserInfo[] = [
 			[SystemProgram.programId.toBase58(), decodeSystemInstruction],
 			[spl.TOKEN_PROGRAM_ID.toBase58(), decodeTokenInstruction],
@@ -621,7 +622,6 @@ export class SolanaParser {
 				}
 			}
 		}
-		console.log({parsers, result})
 		this.instructionParsers = result;
 	}
 

@@ -540,6 +540,7 @@ class SolanaParser {
      */
     constructor(programInfos, parsers) {
         this.instructionDecoders = new Map();
+        this.instructionParsers = new Map();
         const standardParsers = [
             [web3_js_1.SystemProgram.programId.toBase58(), decodeSystemInstruction],
             [spl.TOKEN_PROGRAM_ID.toBase58(), decodeTokenInstruction],
@@ -563,7 +564,6 @@ class SolanaParser {
                 }
             }
         }
-        console.log({ parsers, result });
         this.instructionParsers = result;
     }
     /**
