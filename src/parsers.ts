@@ -588,7 +588,7 @@ function flattenIdlAccounts(accounts: IdlAccountItem[], prefix?: string): IdlAcc
  */
 export class SolanaParser {
 	private instructionParsers: InstructionParsers;
-	private instructionDecoders: Map<PublicKey | string, BorshInstructionCoder>;
+	private instructionDecoders: Map<string, BorshInstructionCoder>;
 	/**
 	 * Initializes parser object
 	 * `SystemProgram`, `TokenProgram` and `AssociatedTokenProgram` are supported by default
@@ -604,12 +604,11 @@ export class SolanaParser {
 			[spl.TOKEN_PROGRAM_ID.toBase58(), decodeTokenInstruction],
 			[spl.ASSOCIATED_TOKEN_PROGRAM_ID.toBase58(), decodeAssociatedTokenInstruction],
 		];
-		let result: InstructionParsers;
-		parsers = parsers || [];
 		for (const programInfo of programInfos) {
-			this.addParserFromIdl(new PublicKey(programInfo.programId), programInfo.idl);
+			this.addParserFromIdl(programInfo.programId.toString(), programInfo.idl);
 		}
 
+		let result: InstructionParsers;
 		if (!parsers) {
 			result = new Map(standardParsers);
 		} else {
@@ -622,7 +621,8 @@ export class SolanaParser {
 				}
 			}
 		}
-		this.instructionParsers = result;
+
+		result.forEach((parser, key) => this.instructionParsers.set(key, parser))
 	}
 
 	/**
@@ -639,14 +639,13 @@ export class SolanaParser {
 	 * @param programId program id to add parser for
 	 * @param idl IDL that describes anchor program
 	 */
-	addParserFromIdl(programId: PublicKey | string, idl: Idl) {
+	addParserFromIdl(programId: string, idl: Idl) {
 		this.instructionDecoders.set(programId, new BorshInstructionCoder(idl));
-		console.log("added decoders", this.instructionDecoders.size, this.instructionParsers.size)
-		this.instructionParsers.set(...this.buildIdlParser(programId, idl));
-		console.log("added parsers", this.instructionDecoders.size, this.instructionParsers.size)
+		const [key, parser] = this.buildIdlParser(programId, idl)
+		this.instructionParsers.set(key, parser);
 	}
 
-	private buildIdlParser(programId: PublicKey | string, idl: Idl): InstructionParserInfo {
+	private buildIdlParser(programId: string, idl: Idl): InstructionParserInfo {
 		const idlParser: ParserFunction<typeof idl, InstructionNames<typeof idl>> = (instruction: TransactionInstruction, decoder: BorshInstructionCoder) => {
 			const parsedIx = decoder?.decode(instruction.data);
 			if (!parsedIx) {
@@ -672,7 +671,6 @@ export class SolanaParser {
 						};
 					}
 				});
-
 				return {
 					name: parsedIx.name,
 					accounts,
@@ -681,7 +679,6 @@ export class SolanaParser {
 				};
 			}
 		};
-
 		return [programId, idlParser.bind(this)];
 	}
 
