@@ -641,7 +641,9 @@ export class SolanaParser {
 	 */
 	addParserFromIdl(programId: PublicKey | string, idl: Idl) {
 		this.instructionDecoders.set(programId, new BorshInstructionCoder(idl));
+		console.log("added decoders", this.instructionDecoders.size, this.instructionParsers.size)
 		this.instructionParsers.set(...this.buildIdlParser(programId, idl));
+		console.log("added parsers", this.instructionDecoders.size, this.instructionParsers.size)
 	}
 
 	private buildIdlParser(programId: PublicKey | string, idl: Idl): InstructionParserInfo {
