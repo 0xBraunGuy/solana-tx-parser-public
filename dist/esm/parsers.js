@@ -542,11 +542,10 @@ export class SolanaParser {
             [spl.TOKEN_PROGRAM_ID.toBase58(), decodeTokenInstruction],
             [spl.ASSOCIATED_TOKEN_PROGRAM_ID.toBase58(), decodeAssociatedTokenInstruction],
         ];
-        let result;
-        parsers = parsers || [];
         for (const programInfo of programInfos) {
-            this.addParserFromIdl(new PublicKey(programInfo.programId), programInfo.idl);
+            this.addParserFromIdl(programInfo.programId.toString(), programInfo.idl);
         }
+        let result;
         if (!parsers) {
             result = new Map(standardParsers);
         }
@@ -560,7 +559,7 @@ export class SolanaParser {
                 }
             }
         }
-        this.instructionParsers = result;
+        result.forEach((parser, key) => this.instructionParsers.set(key, parser));
     }
     /**
      * Adds (or updates) parser for provided programId
@@ -577,9 +576,8 @@ export class SolanaParser {
      */
     addParserFromIdl(programId, idl) {
         this.instructionDecoders.set(programId, new BorshInstructionCoder(idl));
-        console.log("added decoders", this.instructionDecoders.size, this.instructionParsers.size);
-        this.instructionParsers.set(...this.buildIdlParser(programId, idl));
-        console.log("added parsers", this.instructionDecoders.size, this.instructionParsers.size);
+        const [key, parser] = this.buildIdlParser(programId, idl);
+        this.instructionParsers.set(key, parser);
     }
     buildIdlParser(programId, idl) {
         const idlParser = (instruction, decoder) => {

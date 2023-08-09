@@ -33,7 +33,7 @@ export declare class SolanaParser {
      * @param programId program id to add parser for
      * @param idl IDL that describes anchor program
      */
-    addParserFromIdl(programId: PublicKey | string, idl: Idl): void;
+    addParserFromIdl(programId: string, idl: Idl): void;
     private buildIdlParser;
     /**
      * Removes parser for provided program id
