@@ -581,7 +581,9 @@ class SolanaParser {
      */
     addParserFromIdl(programId, idl) {
         this.instructionDecoders.set(programId, new anchor_1.BorshInstructionCoder(idl));
+        console.log("added decoders", this.instructionDecoders.size, this.instructionParsers.size);
         this.instructionParsers.set(...this.buildIdlParser(programId, idl));
+        console.log("added parsers", this.instructionDecoders.size, this.instructionParsers.size);
     }
     buildIdlParser(programId, idl) {
         const idlParser = (instruction, decoder) => {
