@@ -604,6 +604,7 @@ export class SolanaParser {
 			[spl.TOKEN_PROGRAM_ID.toBase58(), decodeTokenInstruction],
 			[spl.ASSOCIATED_TOKEN_PROGRAM_ID.toBase58(), decodeAssociatedTokenInstruction],
 		];
+
 		for (const programInfo of programInfos) {
 			this.addParserFromIdl(programInfo.programId.toString(), programInfo.idl);
 		}
@@ -622,7 +623,7 @@ export class SolanaParser {
 			}
 		}
 
-		result.forEach((parser, key) => this.instructionParsers.set(key, parser))
+		result.forEach((parser, key) => this.instructionParsers.set(key, parser));
 	}
 
 	/**
